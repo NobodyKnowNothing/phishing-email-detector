@@ -1,4 +1,9 @@
 import re
+import base64
+from email import policy
+from email.parser import BytesParser
+from email.generator import BytesGenerator
+
 
 def extract_header_components(header):
     message_info = []
@@ -123,8 +128,43 @@ def gmail_pharser(message_id, service):
         return header      
         
         
-        
 
+def import_eml_message(eml_path, service):
+    """Import an EML file into Gmail using the same style as messages().get()"""
+
+    with open(eml_path, 'rb') as f:
+        msg = BytesParser(policy=policy.default).parse(f)
+    
+    original_message_id = msg['Message-ID']
+    
+    # Rebuild raw message
+    buffer = io.BytesIO()
+    BytesGenerator(buffer, policy=policy.default).flatten(msg)
+    raw = base64.urlsafe_b64encode(buffer.getvalue()).decode()
+
+    # Import with custom metadata
+    message_response = service.users().messages().import_(
+        userId='me',
+        body={
+            'raw': raw,
+            'labelIds': ['INBOX'],
+            'internalDateSource': 'dateHeader',  # Preserve original timestamp
+            'payload': {
+                'headers': [{
+                    'name': 'X-Original-Message-ID',
+                    'value': original_message_id
+                }]
+            }
+        }
+    ).execute()
+
+    # Add original ID to response
+    message_response['originalMessageId'] = original_message_id
+    message_response['gmailMessageId'] = message_response['id']
+
+    print(f"Original ID: {original_message_id}")
+    print(f"Gmail ID: {message_response['id']}")
+    return message_response
 
     
     
