@@ -1,0 +1,10 @@
+main.py complie all functions toghthere 
+google_api.py handel all googleAPI realted STUFF
+phishing_checks.py has functions for every phishing
+ui_manager.py
+
+
+email_info
+subject
+sender
+label
