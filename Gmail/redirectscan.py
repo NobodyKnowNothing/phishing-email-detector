@@ -131,13 +131,10 @@ def trace_redirects_and_get_final_html(start_url, poll_interval=0.2, stability_t
 
     return redirect_urls, final_html
 
-# --- Example Usage ---
+
 if __name__ == "__main__":
-    # Examples:
-    # url_to_trace = "http://google.com"
-    # url_to_trace = "http://bit.ly/3rQzqgO"
-    # url_to_trace = "http://t.co/UVyRTmIF"
-    url_to_trace = "http://httpbin.org/redirect/3" # Will redirect 3 times to /get
+
+    url_to_trace = "https://fishmoxfishflex.us8.list-manage.com/track/click?u=9b36e2e86de48fb31a055da16&id=6c35e5e819&e=a2c18624b3"
 
     if not url_to_trace.startswith(('http://', 'https://')):
          print(f"Warning: URL '{url_to_trace}' doesn't start with http:// or https://. Adding http://")
@@ -155,10 +152,10 @@ if __name__ == "__main__":
     else:
         print("Could not determine redirect chain.")
 
-    print("\n--- Final Page HTML ---")
+"""    print("\n--- Final Page HTML ---")
     if html_content:
         print(html_content)
     elif final_url_list: # If we had URLs but no HTML
         print("Could not retrieve the HTML source for the final page.")
     else: # If we didn't even get URLs
-        print("No final page reached or HTML available.")
+        print("No final page reached or HTML available.")"""
