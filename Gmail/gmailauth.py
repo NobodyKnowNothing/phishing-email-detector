@@ -11,10 +11,8 @@ from googleapiclient.errors import HttpError
 # --- Configuration ---
 # If modifying these scopes, delete the file token.json.
 SCOPES = [
-    'https://www.googleapis.com/auth/gmail.readonly',
-    # Add other scopes as needed, e.g.:
-    # 'https://www.googleapis.com/auth/gmail.send',
-    # 'https://www.googleapis.com/auth/gmail.modify',
+    'https://www.googleapis.com/auth/gmail.send',
+    'https://www.googleapis.com/auth/gmail.modify'
 ]
 CREDENTIALS_FILE = 'credentials.json' # Path to your credentials JSON file
 TOKEN_FILE = 'token.json'             # Stores the user's access and refresh tokens
@@ -92,80 +90,3 @@ def authenticate_gmail():
     except Exception as e:
         print(f'An unexpected error occurred: {e}')
         return None
-
-# --- Example API Calls ---
-
-def list_labels(service):
-    """Lists the user's Gmail labels."""
-    if not service:
-        print("Service object is not valid.")
-        return
-    try:
-        results = service.users().labels().list(userId='me').execute()
-        labels = results.get('labels', [])
-
-        if not labels:
-            print('No labels found.')
-            return
-        print('\n--- Labels ---')
-        for label in labels:
-            print(f"- {label['name']} (ID: {label['id']})")
-        print('--------------')
-
-    except HttpError as error:
-        print(f'An API error occurred: {error}')
-    except Exception as e:
-        print(f'An unexpected error occurred: {e}')
-
-
-def list_messages(service, max_results=10, query=''):
-    """Lists messages based on a query."""
-    if not service:
-        print("Service object is not valid.")
-        return
-    try:
-        results = service.users().messages().list(userId='me', maxResults=max_results, q=query).execute()
-        messages = results.get('messages', [])
-
-        if not messages:
-            print(f"No messages found matching query '{query}'.")
-            return
-
-        print(f"\n--- Messages (first {len(messages)}) ---")
-        for message_info in messages:
-            msg_id = message_info['id']
-            # Get snippet or full message if needed (requires another API call)
-            # For snippet:
-            msg = service.users().messages().get(userId='me', id=msg_id, format='metadata', metadataHeaders=['Subject', 'From', 'Date']).execute()
-            headers = msg['payload']['headers']
-            subject = next((h['value'] for h in headers if h['name'] == 'Subject'), 'No Subject')
-            sender = next((h['value'] for h in headers if h['name'] == 'From'), 'No Sender')
-            date = next((h['value'] for h in headers if h['name'] == 'Date'), 'No Date')
-            print(f"- ID: {msg_id}")
-            print(f"  From: {sender}")
-            print(f"  Subject: {subject}")
-            print(f"  Date: {date}")
-            # print(f"  Snippet: {msg.get('snippet', 'N/A')}") # Can be large
-            print("-" * 10)
-
-        print('--------------------')
-
-    except HttpError as error:
-        print(f'An API error occurred: {error}')
-    except Exception as e:
-        print(f'An unexpected error occurred: {e}')
-
-# --- Main Execution ---
-if __name__ == '__main__':
-    print("Starting Gmail API script...")
-    gmail_service = authenticate_gmail()
-
-    if gmail_service:
-        # --- Call the functions you need ---
-        list_labels(gmail_service)
-        # list_messages(gmail_service, max_results=5, query='is:unread') # Example: List 5 unread messages
-        # list_messages(gmail_service, max_results=3, query='from:someone@example.com') # Example: List messages from specific sender
-
-        print("\nScript finished.")
-    else:
-        print("Could not authenticate or build Gmail service. Exiting.")
