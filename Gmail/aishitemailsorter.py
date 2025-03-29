@@ -45,7 +45,7 @@ SUSPICIOUS_KEYWORDS = [
     "verify your account", "update your payment", "confirm your identity",
     "password check", "security alert", "account suspended", "urgent action required",
     "invoice attached", "wire transfer request", "gift card purchase", "dear customer",
-    "click here to login", "unusual sign-in activity"
+    "click here to login", "unusual sign-in activity", "package waiting", "for delivery"
 ]
 
 # Potentially Dangerous Attachment File Extensions/MIME types (lowercase)
