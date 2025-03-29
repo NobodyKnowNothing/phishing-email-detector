@@ -1,187 +1,148 @@
 import requests
 import hashlib
-import os # Added for file path operations
-from typing import Tuple, Optional
+import os
+from typing import Tuple, Optional, Union
+import urllib.parse
+import re
 
-# (Keep the check_url_content_hash function as defined before)
-def check_url_content_hash(url: str, previous_hash: Optional[str]) -> Tuple[bool, Optional[str]]:
+def url_to_filename(url):
+    # Decode URL-encoded characters
+    decoded = urllib.parse.unquote(url)
+    # Remove protocol and fragments
+    cleaned = re.sub(r"^https?://(www\.)?", "", decoded.split('?')[0].split('#')[0])
+    # Replace invalid characters with underscores
+    cleaned = re.sub(r"[^\w\-\.]", "_", cleaned)
+    # Collapse underscores and trim
+    cleaned = re.sub(r"_+", "_", cleaned).strip("_.")
+    # Truncate to 255 characters
+    return cleaned[:255]
+
+def check_url_content_hash(url: str, previous_hash: Optional[str]) -> Tuple[bool, Optional[str], Optional[bytes]]:
     """
-    Fetches content from a URL, calculates its SHA-256 hash, and compares
-    it with a previously saved hash.
+    Fetches content from a URL, calculates its SHA-256 hash, and compares it with a previously saved hash.
 
     Args:
         url: The URL of the resource to check.
-        previous_hash: The previously calculated SHA-256 hash (hex digest string)
-                       to compare against. Use None or an empty string if no
-                       previous hash exists (e.g., first run).
+        previous_hash: The previously calculated SHA-256 hash (hex digest string) to compare against.
 
     Returns:
-        A tuple (is_match, current_hash):
-        - is_match (bool): True if the current hash matches the previous_hash,
-                           False otherwise. Returns False if an error occurs
-                           during fetch or hashing.
-        - current_hash (Optional[str]): The calculated SHA-256 hash of the
-                                        current content from the URL (hex digest).
-                                        Returns None if an error occurred.
-
-    Raises:
-        requests.exceptions.RequestException: Can be raised if there's a fundamental
-                                              issue with the request (network, DNS etc.).
-                                              It's often better to catch this in the
-                                              calling code for specific handling.
+        A tuple (is_match, current_hash, content_bytes):
+        - is_match (bool): True if the current hash matches the previous_hash, False otherwise.
+        - current_hash (Optional[str]): The calculated SHA-256 hash of the content.
+        - content_bytes (Optional[bytes]): The content bytes fetched from the URL. None if an error occurred.
     """
     current_hash = None
     is_match = False
+    content_bytes = None
 
     try:
-        # Set a reasonable timeout (e.g., 15 seconds)
         response = requests.get(url, timeout=15)
-
-        # Raise an exception for bad status codes (4xx client error, 5xx server error)
         response.raise_for_status()
-
-        # Get content as bytes - important for consistent hashing across systems/encodings
         content_bytes = response.content
 
-        # Calculate SHA-256 hash
         hasher = hashlib.sha256()
         hasher.update(content_bytes)
         current_hash = hasher.hexdigest()
 
-        # Perform the comparison
-        # Check if previous_hash exists and is non-empty before comparing
         if previous_hash and current_hash == previous_hash:
             is_match = True
         else:
-            # Handles cases where previous_hash is None, empty, or simply doesn't match
             is_match = False
 
-        return is_match, current_hash
+        return is_match, current_hash, content_bytes
 
     except requests.exceptions.Timeout:
         print(f"Error: Request timed out for URL: {url}")
-        return False, None # Indicate failure: no match, no current hash
+        return False, None, None
     except requests.exceptions.HTTPError as e:
         print(f"Error: HTTP Error {e.response.status_code} for URL: {url}")
-        return False, None
+        return False, None, None
     except requests.exceptions.RequestException as e:
-        # Catch other potential requests errors (ConnectionError, TooManyRedirects, etc.)
         print(f"Error: Failed to fetch URL {url}: {e}")
-        # Optionally re-raise if the caller should handle it: raise
-        return False, None
+        return False, None, None
     except Exception as e:
-        # Catch any other unexpected errors during hashing etc.
         print(f"Error: An unexpected error occurred during hash check for {url}: {e}")
-        return False, None
+        return False, None, None
 
-# --- New Function for Monitoring Logic ---
-def monitor_url_change(url: str, hash_file_path: str) -> Tuple[bool, Optional[str], Optional[str]]:
+def monitor_url_change(url: str, hash_file_path: str) -> Tuple[bool, Optional[str], Optional[str], Optional[bytes]]:
     """
-    Monitors a URL for content changes based on its SHA-256 hash.
-    Loads the previous hash from a file, checks the URL, compares hashes,
-    and saves the new hash if a change is detected or if it's the first run.
+    Monitors a URL for content changes and returns the content if changed.
 
     Args:
         url: The URL of the resource to monitor.
-        hash_file_path: The path to the file where the hash is stored.
+        hash_file_path: Path to the file storing the previous hash.
 
     Returns:
-        A tuple (content_changed, current_hash, previous_hash):
-        - content_changed (bool): True if the content hash changed compared to the
-                                  stored hash (or if no previous hash existed).
-                                  False if the hash matches or if an error occurred
-                                  during the check.
-        - current_hash (Optional[str]): The hash of the content fetched during
-                                        this check. None if an error occurred.
-        - previous_hash (Optional[str]): The hash loaded from the file. None if
-                                         the file didn't exist or was empty.
+        A tuple (content_changed, current_hash, previous_hash, content_bytes):
+        - content_changed (bool): True if content changed or first run.
+        - current_hash (Optional[str]): Current content hash.
+        - previous_hash (Optional[str]): Previous hash from file.
+        - content_bytes (Optional[bytes]): Content bytes from the URL.
     """
     previous_saved_hash = None
     content_changed = False
     latest_hash = None
+    content_bytes = None
 
-    # --- Load Previous Hash ---
     try:
         if os.path.exists(hash_file_path):
             with open(hash_file_path, 'r') as f:
                 previous_saved_hash = f.read().strip()
-                if not previous_saved_hash: # Handle empty file case
+                if not previous_saved_hash:
                     previous_saved_hash = None
-                    print(f"Info: Hash file '{hash_file_path}' was empty. Treating as first check.")
-                else:
-                     print(f"Loaded previous hash from '{hash_file_path}': {previous_saved_hash}")
-        else:
-            print(f"Info: Hash file '{hash_file_path}' not found. Assuming first check.")
     except Exception as e:
-        print(f"Warning: Error reading hash file '{hash_file_path}': {e}. Proceeding as first check.")
-        previous_saved_hash = None # Ensure it's None if read fails
+        print(f"Warning: Error reading hash file: {e}")
+        previous_saved_hash = None
 
-    # --- Perform the Check ---
-    print(f"\nChecking URL: {url}...")
     try:
-        match_status, latest_hash = check_url_content_hash(url, previous_saved_hash)
-
-        if latest_hash is not None: # Check succeeded
-            print(f"Previous Hash: {previous_saved_hash if previous_saved_hash else 'N/A'}")
-            print(f"Current Hash:  {latest_hash}")
-
-            if not match_status:
-                # Content changed OR it's the first run (previous_saved_hash was None/empty)
-                content_changed = True
-                print("Result: Content HAS CHANGED (or this is the first run/hash file was empty/unreadable).")
-                # Save the new hash
+        match_status, latest_hash, content_bytes = check_url_content_hash(url, previous_saved_hash)
+        if latest_hash is not None:
+            content_changed = not match_status
+            if content_changed:
                 try:
                     with open(hash_file_path, 'w') as f:
                         f.write(latest_hash)
-                    print(f"Saved new hash to '{hash_file_path}'.")
                 except Exception as e:
-                    print(f"Error: Failed to save new hash to '{hash_file_path}': {e}")
-                    # Note: content_changed remains True, but the state for the *next* run is now uncertain.
-            else:
-                # Hashes match
-                content_changed = False
-                print("Result: Content HAS NOT CHANGED.")
-
+                    print(f"Error saving new hash: {e}")
         else:
-            # check_url_content_hash failed and already printed an error
-            print("Result: Could not determine content status due to an error during fetch/hash.")
-            content_changed = False # Cannot confirm change if check failed
-
+            content_changed = False
     except requests.exceptions.RequestException as e:
-         # Catching errors explicitly raised by check_url_content_hash or requests itself
-         print(f"A critical network or request error occurred: {e}")
-         print("Result: Could not perform check.")
-         content_changed = False # Cannot confirm change if check failed
-         latest_hash = None # Ensure current_hash is None on critical failure
+        print(f"Critical error during request: {e}")
+        content_changed = False
 
-    return content_changed, latest_hash, previous_saved_hash
+    return content_changed, latest_hash, previous_saved_hash, content_bytes
 
-# --- Example Usage of the New Function ---
+def webrawTxtScan(url_to_watch: str, hash_storage_file: str) -> None:
+    """
+    Checks for changes in the URL content and updates the specified file if changed.
 
-if __name__ == "__main__":
-    # Configuration
-    url_to_watch = "https://raw.githubusercontent.com/Phishing-Database/Phishing.Database/refs/heads/master/phishing-domains-ACTIVE.txt"
-    hash_storage_file = "readme_last_hash.txt" # Use a more specific name
-
-    # Execute the monitoring process
-    changed, current, previous = monitor_url_change(url_to_watch, hash_storage_file)
-
+    Args:
+        url_to_watch: URL to monitor for content changes.
+        hash_storage_file: File to store the content hash.
+        content_file_path: File to update with the latest content.
+    """
+    changed, current_hash, previous_hash, content_bytes = monitor_url_change(url_to_watch, hash_storage_file)
+    content_file_path = f"Data Acquisition\Data\{url_to_filename(url_to_watch)}.txt"
     print("\n--- Monitoring Summary ---")
-    if current:
+    if current_hash:
         if changed:
-            print(f"Action Recommended: Content at {url_to_watch} has changed.")
-            print(f"  Previous Hash: {previous if previous else 'None (first run or file error)'}")
-            print(f"  New Hash:      {current}")
+            print(f"Content changed. Updating {content_file_path}.")
+            if content_bytes is not None:
+                try:
+                    with open(content_file_path, 'wb') as f:
+                        f.write(content_bytes)
+                    print(f"Successfully updated {content_file_path}")
+                except Exception as e:
+                    print(f"Error updating content file: {e}")
+            else:
+                print("No content to save.")
         else:
-            print(f"No Change Detected: Content at {url_to_watch} remains the same.")
-            print(f"  Current Hash: {current}")
+            print("No change detected.")
     else:
-        print(f"Check Failed: Could not verify content at {url_to_watch}.")
-        print(f"  Previous Hash from file (if loaded): {previous if previous else 'N/A'}")
+        print("Check failed. Unable to verify content.")
 
-    # Example of how you might use the boolean 'changed' flag
-    if changed:
-        # Trigger some notification or action here
-        print("\nTriggering notification (simulation)...")
-        # send_email("admin@example.com", f"Content changed: {url_to_watch}", f"New hash: {current}")
-        pass
+# Example usage
+if __name__ == "__main__":
+    url = "https://raw.githubusercontent.com/python/cpython/main/README.rst"
+    hash_file = "Data Acquisition\Data\hash_blacklist.txt"
+    webrawTxtScan(url, hash_file)
