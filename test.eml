@@ -1,0 +1,578 @@
+Delivered-To: kokokokolol10@gmail.com
+Received: by 2002:adf:e2c8:0:b0:391:281f:cc35 with SMTP id d8csp95506wrj;
+        Thu, 13 Mar 2025 11:14:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH21auj1GPcQ9CRzch9joZPFjBT9yon4xGc1CNBbilvppDy+tYzToMolFAo/1diYrfJoEoy
+X-Received: by 2002:a5d:5f8b:0:b0:38f:27d3:1b44 with SMTP id ffacd0b85a97d-39263de1836mr4462856f8f.2.1741889674782;
+        Thu, 13 Mar 2025 11:14:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1741889674; cv=none;
+        d=google.com; s=arc-20240605;
+        b=PF1bEzAFpGAttlpsEH6MJu+hNUAHWqJZ6oYVFwp/aoiblfmpx6R1p8r4qeQ1JXlyfT
+         g4cXn/sAYfg82iL6KIgQv19eVYWfg+dU7y8nK0jLlGbP1U22Rjr+vty2QuIncciVPzBe
+         3dhBkWUVOIl2MU5cTutheqmK0OgZD40AAFxDZGNmUy2w8j8q65S0NbbOfwASfvsmQ2Ha
+         7SEAkknWYnmcCB0B5AL2ZDsusYdJdNuZMHQNZZfNhCgnUr2qodaU9AOJutvWoPU2OfUN
+         KKNnHkR1vEouP/J6UZgGEXwvGqsaRqNoAMMCeX7AMBl99WT4HmdVpaTGbGBMUDXKMJUV
+         zyLw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=precedence:feedback-id:list-unsubscribe-post:list-unsubscribe
+         :list-id:date:subject:to:from:mime-version:message-id:dkim-signature
+         :dkim-signature;
+        bh=0fqZ3ULUCWPSukOgJMLzjVu6n/ejLOUgZG+r2WSErQA=;
+        fh=JBqBaZlGZuFq5SJkflW9+ZuhNYaBkBdvaHh61NdyDg4=;
+        b=YaxdI0tGZFqSZCrpoq8pRT5eo/SwxUQIlhpQRZukS1QMV+pRmhJntF4LC/mD+Jl21H
+         V91jKCINr/GaNhkx5CFDLoHoLKYvm2pg5ez+F1Z7oO13Irrr7IRBrQvSo5tTlJ61v5SV
+         OqjGwwyrGsDhqGeGV1bIFE+Gdz6rphrEnWu1ndxjGkHb1BeHfk9JFfCvtnUqTJqXvA18
+         Y8U6cG+7iuA6Vrmc3ELPblwSm8B/1sBD8CqCsK4SEEjfJfICJkZety+KbQFz5D5ZwF5o
+         XRaCBhvFsESWGvkEwAe5PBvo6SPCgMnSaiEcxoD+CCwWdUwL57/ul3L6PNj06u5MhnL7
+         +5Cg==;
+        dara=google.com
+ARC-Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@codymontana.com header.s=mailjet header.b=u9YlFFYs;
+       dkim=pass header.i=@bnc3.mailjet.com header.s=mailjet1 header.b=WIjetSm6;
+       spf=pass (google.com: domain of 99775f5c.auyaagwjpoiaachutwwaalyzlhqaaaaaz8ianpdqabjfhgbn0ycj@a1197446.bnc3.mailjet.com designates 87.253.233.173 as permitted sender) smtp.mailfrom=99775f5c.AUYAAGWJpOIAAchutWwAALYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJ@a1197446.bnc3.mailjet.com;
+       dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=codymontana.com
+Return-Path: <99775f5c.AUYAAGWJpOIAAchutWwAALYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJ@a1197446.bnc3.mailjet.com>
+Received: from o173.p8.mailjet.com (o173.p8.mailjet.com. [87.253.233.173])
+        by mx.google.com with UTF8SMTPS id 5b1f17b1804b1-43d18a87dc9si13715455e9.170.2025.03.13.11.14.34
+        for <kokokokolol10@gmail.com>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Mar 2025 11:14:34 -0700 (PDT)
+Received-SPF: pass (google.com: domain of 99775f5c.auyaagwjpoiaachutwwaalyzlhqaaaaaz8ianpdqabjfhgbn0ycj@a1197446.bnc3.mailjet.com designates 87.253.233.173 as permitted sender) client-ip=87.253.233.173;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@codymontana.com header.s=mailjet header.b=u9YlFFYs;
+       dkim=pass header.i=@bnc3.mailjet.com header.s=mailjet1 header.b=WIjetSm6;
+       spf=pass (google.com: domain of 99775f5c.auyaagwjpoiaachutwwaalyzlhqaaaaaz8ianpdqabjfhgbn0ycj@a1197446.bnc3.mailjet.com designates 87.253.233.173 as permitted sender) smtp.mailfrom=99775f5c.AUYAAGWJpOIAAchutWwAALYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJ@a1197446.bnc3.mailjet.com;
+       dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=codymontana.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; q=dns/txt;
+  d=codymontana.com; i=jeff@codymontana.com; s=mailjet; x=1741896874;
+  h=message-id:mime-version:from:from:to:to:subject:subject:date:date:list-id:list-unsubscribe:
+  list-unsubscribe-post:feedback-id:precedence:x-campaignid:x-csa-complaints:
+  x-mj-mid:x-mj-smtpguid:x-report-abuse-to:content-type;
+  bh=0fqZ3ULUCWPSukOgJMLzjVu6n/ejLOUgZG+r2WSErQA=;
+  b=u9YlFFYsi11d6QqGwi3mBYt3jw73eiVq7zK7L9AEp8f25Ma9X4Pv/U97S
+ tdfA/zUofyIwc5q4G0GgYIA1b312ACkIe5A8fx6HkBTidOuAT4MNPtCimZ/G
+ AZyySLjrnJqZs4+J+FdRune3OCotT6XkRPjMi99ExxTfjpmEXCud5g=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; q=dns/txt;
+  d=bnc3.mailjet.com; s=mailjet1; x=1741896874;
+  h=message-id:mime-version:from:from:to:to:subject:subject:date:date:list-id:list-unsubscribe:
+  list-unsubscribe-post:feedback-id:precedence:x-campaignid:x-csa-complaints:
+  x-mj-mid:x-mj-smtpguid:x-report-abuse-to:content-type;
+  bh=0fqZ3ULUCWPSukOgJMLzjVu6n/ejLOUgZG+r2WSErQA=;
+  b=WIjetSm6hHrl38W0v96uwUYUlxtQJWiVkfjSMG6hEMvjKtVNBLNWxGZC3
+ 2WdJ5/mA5WK6ULKJHny2KWF+Y6TNryFCQb2RIypdoUPejVKR1WNy2cwp6lK4
+ poiNq3jQp+mENOqYQ+6/q1w43EOmB1059E7BRMDX0xuGtPimW7ISic=
+Return-Path:
+	<99775f5c.AUYAAGWJpOIAAchutWwAALYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJ@a1197446.bnc3.mailjet.com>
+Message-Id: <99775f5c.AUYAAGWJpOIAAchutWwAALYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJ@mailjet.com>
+MIME-Version: 1.0
+From: Canada Giveaways <jeff@codymontana.com>
+To: kokokokolol10@gmail.com
+Subject: =?UTF-8?Q?=E2=AD=90_Giveaways_-_$37=2C000_?=
+ =?UTF-8?Q?cash_=E2=80=A2_RAM_Truck=2C_Corvette=2C_?=
+ =?UTF-8?Q?Denali_=E2=80=A2_Nashville=2C_Bahamas=2C_?=
+ =?UTF-8?Q?Whistler_=2E=2E=2E_?=
+Date: Thu, 13 Mar 2025 18:14:33 +0000 (UTC)
+List-Id: <jeff.codymontana.com.xz4z7-5i986.mj>
+List-Unsubscribe:
+	<mailto:unsub-99775f5c.xz4z7.lloywz137xuq@bnc3.mailjet.com>,
+	<https://xz4z7.mjt.lu/unsub2?m=AUYAAGWJpOIAAchutWwAALYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJYEZVqIskQvm2UUXmPSEvMgASSNU&b=99775f5c&e=c6fc92c9&x=q69VzT8R9XRyWf_oRxAR4jAhxFIsF24Yf0NsM5LYmL0>
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+Feedback-Id: 42.1197446.1198293:MJ
+Precedence: bulk
+X-CampaignID: 7657665900
+X-CSA-Complaints: csa-complaints@eco.de
+X-MJ-Mid:
+	AUYAAGWJpOIAAchutWwAALYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJYEZVqIskQvm2UUXmPSEvMgASSNU
+X-MJ-SMTPGUID: 604655a8-8b24-42f9-b651-45e63d212f32
+X-REPORT-ABUSE-TO: Message sent by Mailjet please report to
+	abuse@mailjet.com with a copy of the message
+Content-Type: multipart/alternative; boundary="=-XlUwIS4TII92vfwrL6FP"
+
+--=-XlUwIS4TII92vfwrL6FP
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+
+
+
+
+
+
+
+
+
+canada giveaways [https://bit.ly/43BJJoD]https://bit.ly/3Q9pATZ
+
+
+
+
+
+March
+2025 Giveaways
+
+
+
+
+
+
+
+
+
+
+
+Trips
+to Nashville ... Bahamas ... Portugal ... Whistler ... Caribbean ... +
+more [https://bit.ly/3Q9pATZ]
+
+
+Learn More [https://bit.ly/44D1BAQ]https://bit.ly/3Q9pATZ
+
+
+
+
+
+$80,000
+GMC Sierra AT4X =E2=80=A2 Ford Mustang, F-150 or Expedition
+[https://bit.ly/3Q9pATZ]
+
+
+Learn More [https://bit.ly/44D1BAQ]https://bit.ly/3Q9pATZ
+
+
+
+
+
+iPhone
+16 =E2=80=A2 $10,000 =E2=80=A2 Samsung Galaxy S25 Ultra =E2=80=A2 $15,000 i=
+n Gasoline
+[https://bit.ly/3Q9pATZ]
+
+
+Learn More [https://bit.ly/44D1BAQ]https://bit.ly/3Q9pATZ
+
+
+
+
+
+$500
+Mastercard =E2=80=A2 2025
+GMC Sierra Denali + $37,000 [https://bit.ly/3Q9pATZ]
+
+
+
+Learn More [https://bit.ly/44D1BAQ]https://bit.ly/3Q9pATZ
+
+
+
+
+
+
+
+
+
+
+...
+and 100+ more giveaways to view
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=C2=A0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+This
+email is deployed in accordance with Canada's Anti-Spam Legislation (CASL).=
+ You
+the subscriber, provided consent to receive further information. You may
+withdraw your consent at any time.
+
+
+
+
+
+This email has been sent to kokokokolol10@gmail.com,
+click here to unsubscribe http://xz4z7.mjt.lu/unsub2?hl=3Den&m=3DAUYAAGWJpO=
+IAAchutWwAALYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJYEZVqIskQvm2UUXmPSEvMgASSNU&b=3D9=
+9775f5c&e=3Dc6fc92c9&x=3Dq69VzT8R9XRyWf_oRxAR4jAhxFIsF24Yf0NsM5LYmL0.
+
+
+
+
+
+
+
+
+
+
+
+cmi
+media inc., 2967 Dundas St. West Suite #301D Toronto, ON M6P-1Z2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=
+
+--=-XlUwIS4TII92vfwrL6FP
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+<HTML>
+=20
+<HEAD>
+<TITLE></TITLE>
+</HEAD>
+
+<BODY>
+<TABLE ALIGN=3D"LEFT" WIDTH=3D"100%">
+<TBODY>
+<TR>
+<TD ALIGN=3D"LEFT" BGCOLOR=3D"#FFFFFF">=20
+<TABLE ALIGN=3D"LEFT" BGCOLOR=3D"#FFFFFF" CELLPADDING=3D"0" CELLSPACING=3D"=
+0"
+ WIDTH=3D"750" STYLE=3D" line-height: 150%; ">
+<TBODY>
+<TR>
+<TD WIDTH=3D"725" ALIGN=3D"LEFT"><a href=3D"http://xz4z7.mjt.lu/lnk/AUYAAGW=
+JpOIAAchutWwAALYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJYEZVqIskQvm2UUXmPSEvMgASSNU/1/=
+nfAaf58G5qZAVHIxX3-x4w/aHR0cHM6Ly9iaXQubHkvM1E5cEFUWg"
+STYLE=3D"text-decoration: none" TARGET=3D"new">
+<IMG SRC=3D"https://bit.ly/43BJJoD" ALT=3D"canada giveaways" ALIGN=3D"TOP"
+ BORDER=3D"0"></A></TD>
+</TR>
+<TR>
+<TD WIDTH=3D"725" ALIGN=3D"LEFT" HEIGHT=3D"35"></TD>
+</TR>
+<TR>
+<TD WIDTH=3D"725" ALIGN=3D"LEFT"><FONT
+STYLE=3D"font-size: 14px; font-style: normal; font-family: Verdana, Arial; =
+">March
+2025 Giveaways</FONT></TD>
+</TR>
+<TR>
+<TD HEIGHT=3D"14" WIDTH=3D"725" ALIGN=3D"CENTER"></TD>
+</TR>
+<TR>
+<TD WIDTH=3D"725"><TABLE BGCOLOR=3D"#FFFFFF" WIDTH=3D"100%">
+<TBODY>
+<TR>
+<TD ALIGN=3D"LEFT" HEIGHT=3D"21" VALIGN=3D"MIDDLE"></TD>
+</TR>
+<TR>
+<TD ALIGN=3D"LEFT" HEIGHT=3D"21" VALIGN=3D"MIDDLE"><a href=3D"http://xz4z7.=
+mjt.lu/lnk/AUYAAGWJpOIAAchutWwAALYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJYEZVqIskQvm2=
+UUXmPSEvMgASSNU/2/Wp8tiDMyrZps1Kj0U-TYbQ/aHR0cHM6Ly9iaXQubHkvM1E5cEFUWg"
+STYLE=3D"text-decoration: none"><FONT COLOR=3D"#800080"
+STYLE=3D"font-size: 14px; font-style: normal; font-family: Verdana, Arial">=
+Trips
+to Nashville ... Bahamas ... Portugal ... Whistler ... Caribbean ... +
+more</FONT></A></TD>
+</TR>
+<TR>
+<TD ALIGN=3D"LEFT" HEIGHT=3D"21" VALIGN=3D"MIDDLE"><a href=3D"http://xz4z7.=
+mjt.lu/lnk/AUYAAGWJpOIAAchutWwAALYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJYEZVqIskQvm2=
+UUXmPSEvMgASSNU/3/LHftOpFLgo6Z3aTNmc99-Q/aHR0cHM6Ly9iaXQubHkvM1E5cEFUWg"
+STYLE=3D"text-decoration: none"><IMG ALT=3D"Learn More" BORDER=3D"0"
+SRC=3D"https://bit.ly/44D1BAQ" VSPACE=3D"5"></A></TD>
+</TR>
+<TR>
+<TD ALIGN=3D"LEFT" HEIGHT=3D"10" VALIGN=3D"MIDDLE"></TD>
+</TR>
+<TR>
+<TD ALIGN=3D"LEFT" HEIGHT=3D"21" VALIGN=3D"MIDDLE"><a href=3D"http://xz4z7.=
+mjt.lu/lnk/AUYAAGWJpOIAAchutWwAALYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJYEZVqIskQvm2=
+UUXmPSEvMgASSNU/4/TB83G9HEZlNPvJ0DazOR0A/aHR0cHM6Ly9iaXQubHkvM1E5cEFUWg"
+STYLE=3D"text-decoration: none"><FONT COLOR=3D"#800080"
+STYLE=3D"font-size: 14px; font-style: normal; font-family: Verdana, Arial">=
+$80,000
+GMC Sierra AT4X &#149; Ford Mustang, F-150 or Expedition
+</FONT></A></TD>
+</TR>
+<TR>
+<TD ALIGN=3D"LEFT" HEIGHT=3D"21" VALIGN=3D"MIDDLE"><a href=3D"http://xz4z7.=
+mjt.lu/lnk/AUYAAGWJpOIAAchutWwAALYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJYEZVqIskQvm2=
+UUXmPSEvMgASSNU/5/sTHQC3Wlk95YxzyniXLu-A/aHR0cHM6Ly9iaXQubHkvM1E5cEFUWg"
+STYLE=3D"text-decoration: none"><IMG ALT=3D"Learn More" BORDER=3D"0"
+SRC=3D"https://bit.ly/44D1BAQ" VSPACE=3D"5"></A></TD>
+</TR>
+<TR>
+<TD ALIGN=3D"LEFT" HEIGHT=3D"10" VALIGN=3D"MIDDLE"></TD>
+</TR>
+<TR>
+<TD ALIGN=3D"LEFT" HEIGHT=3D"21" VALIGN=3D"MIDDLE"><a href=3D"http://xz4z7.=
+mjt.lu/lnk/AUYAAGWJpOIAAchutWwAALYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJYEZVqIskQvm2=
+UUXmPSEvMgASSNU/6/6HT1d-I_beMZWvrfA54EmQ/aHR0cHM6Ly9iaXQubHkvM1E5cEFUWg"
+STYLE=3D"text-decoration: none"><FONT COLOR=3D"#800080"
+STYLE=3D"font-size: 14px; font-style: normal; font-family: Verdana, Arial">=
+iPhone
+16 &#149; $10,000 &#149; Samsung Galaxy S25 Ultra &#149; $15,000 in Gasolin=
+e
+</FONT></A> </TD>
+</TR>
+<TR>
+<TD ALIGN=3D"LEFT" HEIGHT=3D"21" VALIGN=3D"MIDDLE"><a href=3D"http://xz4z7.=
+mjt.lu/lnk/AUYAAGWJpOIAAchutWwAALYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJYEZVqIskQvm2=
+UUXmPSEvMgASSNU/7/T3jSo-GWeBt4j7YVGkrKmg/aHR0cHM6Ly9iaXQubHkvM1E5cEFUWg"
+STYLE=3D"text-decoration: none"><IMG ALT=3D"Learn More" BORDER=3D"0"
+SRC=3D"https://bit.ly/44D1BAQ" VSPACE=3D"5"></A></TD>
+</TR>
+<TR>
+<TD ALIGN=3D"LEFT" HEIGHT=3D"10" VALIGN=3D"MIDDLE"></TD>
+</TR>
+<TR>
+<TD ALIGN=3D"LEFT" HEIGHT=3D"21" VALIGN=3D"MIDDLE"><a href=3D"http://xz4z7.=
+mjt.lu/lnk/AUYAAGWJpOIAAchutWwAALYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJYEZVqIskQvm2=
+UUXmPSEvMgASSNU/8/Scr3-Myq0N5xFzKSOfhxUQ/aHR0cHM6Ly9iaXQubHkvM1E5cEFUWg"
+STYLE=3D"text-decoration: none"><FONT COLOR=3D"#800080"
+STYLE=3D"font-size: 14px; font-style: normal; font-family: Verdana, Arial">=
+$500
+Mastercard &#149; 2025
+GMC Sierra Denali + $37,000</A>=20
+</TD>
+</TR>
+<TR>
+<TD ALIGN=3D"LEFT" HEIGHT=3D"21" VALIGN=3D"MIDDLE"><a href=3D"http://xz4z7.=
+mjt.lu/lnk/AUYAAGWJpOIAAchutWwAALYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJYEZVqIskQvm2=
+UUXmPSEvMgASSNU/9/zryYErjNEaWegjpKXBXgHw/aHR0cHM6Ly9iaXQubHkvM1E5cEFUWg"
+STYLE=3D"text-decoration: none"><IMG ALT=3D"Learn More" BORDER=3D"0"
+SRC=3D"https://bit.ly/44D1BAQ" VSPACE=3D"5"></A></TD>
+</TR>
+<TR>
+<TD ALIGN=3D"LEFT" HEIGHT=3D"10" VALIGN=3D"MIDDLE"></TD>
+</TR>
+
+<TR>
+<TD ALIGN=3D"LEFT" HEIGHT=3D"30" VALIGN=3D"MIDDLE"></TD>
+</TR>
+
+<TR>
+<TD ALIGN=3D"LEFT" VALIGN=3D"MIDDLE" HEIGHT=3D"21"><FONT
+STYLE=3D"font-size: 14px; font-style: normal; font-family: Verdana, Arial">=
+...
+and 100+ more giveaways to view</FONT> </TD>
+</TR>
+<TR>
+<TD ALIGN=3D"LEFT" HEIGHT=3D"35" VALIGN=3D"MIDDLE"> </TD>
+</TR>
+<TR>
+<TD ALIGN=3D"CENTER" HEIGHT=3D"30" VALIGN=3D"MIDDLE"></TD>
+</TR>
+</TBODY>
+</TABLE>
+</TD>
+</TR>
+<TR>
+<TD WIDTH=3D"725"> </TD>
+</TR>
+<TR>
+<TD WIDTH=3D"725">&nbsp;</TD>
+</TR>
+<TR>
+<TD WIDTH=3D"725">=20
+<TABLE ALIGN=3D"CENTER" BGCOLOR=3D"#FFFFFF" CELLPADDING=3D"0" CELLSPACING=
+=3D"0"
+ WIDTH=3D"725">
+<TBODY>
+<TR>
+<TD ALIGN=3D"CENTER" WIDTH=3D"725">=20
+<TABLE ALIGN=3D"CENTER" CELLPADDING=3D"0" CELLSPACING=3D"0" WIDTH=3D"725">
+<TBODY>
+<TR>
+<TD WIDTH=3D"725">=20
+<TABLE CELLPADDING=3D"0" CELLSPACING=3D"0" STYLE=3D" line-height: 150%; "
+ WIDTH=3D"725">
+<TBODY>
+<TR>
+<TD ALIGN=3D"LEFT" HEIGHT=3D"55"></TD>
+</TR>
+<TR>
+<TD ALIGN=3D"CENTER">=20
+<TABLE CELLPADDING=3D"0" CELLSPACING=3D"0" STYLE=3D" line-height: 120%; "
+ WIDTH=3D"100%">
+<TBODY>
+<TR>
+<TD ALIGN=3D"CENTER" HEIGHT=3D"75"></TD>
+</TR>
+<TR>
+<TD ALIGN=3D"CENTER" HEIGHT=3D"10"></TD>
+</TR>
+<TR>
+<TD ALIGN=3D"LEFT"><FONT COLOR=3D"#000000"
+STYLE=3D"font-size: 11px; font-style: normal; font-family: Verdana, Arial">=
+This
+email is deployed in accordance with Canada's Anti-Spam Legislation (CASL).=
+ You
+the subscriber, provided consent to receive further information. You may
+withdraw your consent at any time. <BR>
+<BR>
+<BR>
+This email has been sent to kokokokolol10@gmail.com,
+<a href=3D"http://xz4z7.mjt.lu/unsub2?hl=3Den&amp;m=3DAUYAAGWJpOIAAchutWwAA=
+LYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJYEZVqIskQvm2UUXmPSEvMgASSNU&amp;b=3D99775f5c=
+&amp;e=3Dc6fc92c9&amp;x=3Dq69VzT8R9XRyWf_oRxAR4jAhxFIsF24Yf0NsM5LYmL0" STYL=
+E=3D"color:inherit;text-decoration:none;"
+ TARGET=3D"_blank">click here to unsubscribe</A>.</FONT><BR>
+<BR>
+<BR>
+</TD>
+</TR>
+<TR>
+<TD ALIGN=3D"CENTER" HEIGHT=3D"27"></TD>
+</TR>
+<TR>
+<TD ALIGN=3D"LEFT"><FONT COLOR=3D"#000000"
+STYLE=3D"font-size: 11px; font-style: normal; font-family: Verdana, Arial">=
+cmi
+media inc., 2967 Dundas St. West Suite #301D Toronto, ON M6P-1Z2 </FONT></T=
+D>
+</TR>
+<TR>
+<TD ALIGN=3D"CENTER"></TD>
+</TR>
+<TR>
+<TD ALIGN=3D"JUSTIFY" HEIGHT=3D"85"></TD>
+</TR>
+</TBODY>
+</TABLE>
+</TD>
+</TR>
+<TR>
+<TD ALIGN=3D"JUSTIFY" HEIGHT=3D"16"></TD>
+</TR>
+<TR>
+<TD ALIGN=3D"JUSTIFY" HEIGHT=3D"16"></TD>
+</TR>
+</TBODY>
+</TABLE>
+</TD>
+</TR>
+</TBODY>
+</TABLE>
+</TD>
+</TR>
+</TBODY>
+</TABLE>
+</TD>
+</TR>
+<TR>
+<TD WIDTH=3D"725"></TD>
+</TR>
+<TR>
+<TD WIDTH=3D"725"></TD>
+</TR>
+<TR>
+<TD WIDTH=3D"725"></TD>
+</TR>
+</TBODY>
+</TABLE>
+</TD>
+</TR>
+</TBODY>
+</TABLE>
+<P></P>
+<P></P>
+<P></P>
+<br/><a style=3D"font-family: Arial, sans-serif;" href=3D"http://xz4z7.mjt.=
+lu/lnk/AUYAAGWJpOIAAchutWwAALYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJYEZVqIskQvm2UUXm=
+PSEvMgASSNU/0/IJQzaIwfxp7R6e_ZiWt35w/aHR0cHM6Ly9iaXQubHkvM1E5cEFUWg?b=3D1">=
+&#8203;</a><div style=3D"display: none; height: 0px; width: 0px; overflow: =
+hidden; visibility: hidden; mso-hide: all"><a href=3D"http://xz4z7.mjt.lu/l=
+nk/AUYAAGWJpOIAAchutWwAALYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJYEZVqIskQvm2UUXmPSEv=
+MgASSNU/0/IJQzaIwfxp7R6e_ZiWt35w/aHR0cHM6Ly9iaXQubHkvM1E5cEFUWg?b=3D2" targ=
+et=3D"_blank" rel=3D"noreferrer">Click on me</a></div><a href=3D"http://xz4=
+z7.mjt.lu/lnk/AUYAAGWJpOIAAchutWwAALYZlHQAAAAAZ8IAnPdQABJFhgBn0yCJYEZVqIskQ=
+vm2UUXmPSEvMgASSNU/0/IJQzaIwfxp7R6e_ZiWt35w/aHR0cHM6Ly9iaXQubHkvM1E5cEFUWg?=
+b=3D3">
+<img src=3D"http://xz4z7.mjt.lu/oo/AUYAAGWJpOIAAchutWwAALYZlHQAAAAAZ8IAnPdQ=
+ABJFhgBn0yCJYEZVqIskQvm2UUXmPSEvMgASSNU/81838697/e.gif" height=3D"1" width=
+=3D"1" alt=3D"" border=3D"0" style=3D"height:1px;width:1px;border:0;"/>
+</a></BODY>
+</HTML>
+=
+
+--=-XlUwIS4TII92vfwrL6FP--
+
