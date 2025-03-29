@@ -4,7 +4,7 @@ from selenium.webdriver.chrome.service import Service as ChromeService # Or Fire
 from webdriver_manager.chrome import ChromeDriverManager # Or FirefoxDriverManager, etc.
 from selenium.common.exceptions import WebDriverException
 
-def trace_redirects_and_get_final_html(start_url, poll_interval=0.2, stability_timeout=2.0, max_wait=30.0):
+def trace_redirects(start_url, poll_interval=0.01, stability_timeout=2.0, max_wait=30.0, driver=None):
     """
     Traces redirects for a given URL using Selenium by polling driver.current_url
     and retrieves the HTML source of the final page.
@@ -35,19 +35,13 @@ def trace_redirects_and_get_final_html(start_url, poll_interval=0.2, stability_t
         options = webdriver.ChromeOptions()
         options.add_argument("--headless")
         options.add_argument("--disable-gpu")
-        options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36")
 
         print("Initializing WebDriver...")
         # Use webdriver_manager for easier setup
-        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
-        # Or for Firefox:
-        # from selenium.webdriver.firefox.service import Service as FirefoxService
-        # from webdriver_manager.firefox import GeckoDriverManager
-        # options = webdriver.FirefoxOptions()
-        # options.add_argument("--headless")
-        # driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options)
+        if driver == None:
+            driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
         print("WebDriver initialized.")
 
         # --- Navigation and Polling ---
@@ -140,7 +134,7 @@ if __name__ == "__main__":
          print(f"Warning: URL '{url_to_trace}' doesn't start with http:// or https://. Adding http://")
          url_to_trace = "http://" + url_to_trace
 
-    final_url_list, html_content = trace_redirects_and_get_final_html(url_to_trace)
+    final_url_list, html_content = trace_redirects(url_to_trace)
 
     print("\n--- Summary ---")
     print(f"Initial URL: {url_to_trace}")
