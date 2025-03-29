@@ -122,6 +122,15 @@ Support Team"""
     # Bind selection event
     email_tree.bind("<<TreeviewSelect>>", lambda e: show_email_details(email_data))
 
+def add_email(email_data):
+    #email_data.append((email, subject, status, body))
+    #email_tree.insert("", "end", values=(email, subject, status))
+    pass
+
+
+
+
+
 def show_email_details(email_data):
     selected = email_tree.selection()
     if not selected:
