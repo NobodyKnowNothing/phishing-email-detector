@@ -8,9 +8,11 @@ from googleapiclient.errors import HttpError
 
 
 SCOPES = [
-    'https://www.googleapis.com/auth/gmail.send',
-    'https://www.googleapis.com/auth/gmail.modify'
+    'https://www.googleapis.com/auth/gmail.readonly',  # Read-only access
+    'https://www.googleapis.com/auth/gmail.modify',    # Read/write access
+    'https://www.googleapis.com/auth/gmail.compose'    # Full access
 ]
+
 CREDENTIALS_FILE = 'credentials.json' 
 TOKEN_FILE = 'token.json'
 
