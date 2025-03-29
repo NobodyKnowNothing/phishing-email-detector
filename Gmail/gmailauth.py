@@ -43,6 +43,7 @@ def authenticate_gmail():
             try:
                 creds.refresh(Request())
             except google.auth.exceptions.RefreshError as e:
+                #TODO :: FIX THIS 
                 print(f"Error refreshing token: {e}")
                 print("Please re-authorize by deleting token.json and running the script again.")
                 # Attempt the full flow if refresh fails
