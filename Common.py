@@ -5,7 +5,7 @@ from email.parser import BytesParser
 from email.generator import BytesGenerator
 import io
 
-def extract_header_components(header, body):
+def extract_header_components(header,body, message_id):
     message_info = []
     
     date = ''
@@ -16,7 +16,6 @@ def extract_header_components(header, body):
     from_field = ''
     subject_field = ''
     to_field = ''
-    message_id = ''
     received = ''
     
     for i in header:
@@ -28,9 +27,10 @@ def extract_header_components(header, body):
             dmarc = 'none'
             # print(authentication_results)
             
-        if i.get('name') == "Received-SPF":
+        if i.get('name') == "Authentication-Results":
             index = header.index(i)
-            spf = header[index].get('value')
+            temp = header[index]
+            spf = re.findall(r'spf=pass|spf=fail', temp.get('value'))
         elif spf == '' or spf == 'none':
             spf = 'none'
             
@@ -51,7 +51,8 @@ def extract_header_components(header, body):
             
         if i.get('name') == "From":
             index = header.index(i)
-            from_field = header[index].get('value')
+            temp = header[index] 
+            from_field = re.findall(r'<([^>]+)>', temp.get('value'))
             # print(from_field)
         elif from_field == '' or from_field == 'none':
             from_field = 'none'
@@ -70,16 +71,11 @@ def extract_header_components(header, body):
         elif to_field == '' or to_field == 'none':
             to_field = 'none'
         
-        if i.get('name') == "Message-ID":
-            index = header.index(i)
-            message_id = header[index].get('value')
-            # print(message_id)
-        elif message_id == '' or message_id == 'none':
-            message_id = 'none'
         
         if i.get('name') == "Received":
             index = header.index(i)
-            received = header[index].get('value')
+            temp = header[index]
+            received = re.findall(r'(?:from|by)\s+([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})', temp.get('value'))
             # print(message_id)
         elif received == '' or received == 'none':
             received = 'none'
@@ -90,6 +86,9 @@ def extract_header_components(header, body):
             # print(message_id)
         elif date == '' or date == 'none':
             date = 'none'
+            
+        
+        
             
     new_item = {
         "message_id" : message_id,
@@ -102,12 +101,9 @@ def extract_header_components(header, body):
         "dkim" : dkim,
         "return_path" : returning_path,
         "received" : received,
-        "body" : body
+       "body" : body
     }
-        
-    #message_info.append(new_item)
-    print("--------------------------------------------")
-    print(new_item.get("dkim"))
+    
     return new_item
 
 # For instance, if you send a test email to 30 mailboxes and it lands in the inbox of 20 recipients, the calculation would be 20/30*10, resulting in a Spam Score of 6.6 out of 10.
@@ -168,7 +164,6 @@ def gmail_pharser(message_id, service):
         
         return (header,body)
         
-        
 
 def import_eml_message(eml_path, service):
     """Import an EML file into Gmail using the same style as messages().get()"""
@@ -206,7 +201,4 @@ def import_eml_message(eml_path, service):
     #print(f"Original ID: {original_message_id}")
     #print(f"Gmail ID: {message_response['id']}")
     return message_response
-
-    
-    
-    
+ 

@@ -38,7 +38,7 @@ def create_scrollable_listbox():
     subject_label = tk.Label(detail_frame, bg="white", anchor="w")
     subject_label.grid(row=1, column=1, sticky="ew", padx=5, pady=2)
     
-    tk.Label(detail_frame, text="Status:", bg="lightgray", anchor="e").grid(row=2, column=0, sticky="e", padx=5, pady=2)
+    tk.Label(detail_frame, text="Threat Score:", bg="lightgray", anchor="e").grid(row=2, column=0, sticky="e", padx=5, pady=2)
     status_label = tk.Label(detail_frame, bg="white", anchor="w")
     status_label.grid(row=2, column=1, sticky="ew", padx=5, pady=2)
     
@@ -75,7 +75,7 @@ def create_scrollable_listbox():
     email_tree = ttk.Treeview(
         bottom_frame,
         style="Bordered.Treeview",
-        columns=("email", "subject", "status"),
+        columns=("email", "subject", "Threat Score"),
         show="headings",
         selectmode="browse"
     )
@@ -84,12 +84,12 @@ def create_scrollable_listbox():
     email_tree.column("#0", width=0, stretch=False)
     email_tree.column("email", anchor="w", width=200)
     email_tree.column("subject", anchor="w", width=600)
-    email_tree.column("status", anchor="center", width=100)
+    email_tree.column("Threat Score", anchor="center", width=100)
     
     # Configure headings
     email_tree.heading("email", text="Sender Email")
     email_tree.heading("subject", text="Subject")
-    email_tree.heading("status", text="Status")
+    email_tree.heading("Threat Score", text="Threat Score")
 
     # Add scrollbar
     scrollbar = ttk.Scrollbar(bottom_frame, orient="vertical", command=email_tree.yview)
@@ -112,8 +112,8 @@ def create_scrollable_listbox():
 def add_email(email_item):
     global email_data, email_tree  # <-- Ensure "email_tree" is declared
 
-    email_data.append((email_item["from"], email_item["subject"], "Score: " + str(email_item["score"]), email_item["body"]))
-    email_tree.insert("", "end", values=(email_item["from"], email_item["subject"], "Score: " + str(email_item["score"])))
+    email_data.append((email_item["from"], email_item["subject"], str(email_item["score"]), email_item["body"]))
+    email_tree.insert("", "end", values=(email_item["from"], email_item["subject"],str(email_item["score"])))
     email_tree.bind("<<TreeviewSelect>>", lambda e: show_email_details(email_data))
 
 
@@ -128,17 +128,18 @@ def show_email_details(email_data):
     email, subject, status = item['values']
     body = email_data[index][3]
     
-    # Update sender label
     detail_frame.grid_slaves(row=0, column=1)[0].config(text=email)
-    # Update subject label
     detail_frame.grid_slaves(row=1, column=1)[0].config(text=subject)
-    # Update status label
-    status_label.config(text=status, 
-                      bg="#FFCCCC" if "Phishing" in status else "#CCFFCC",
-                      fg="red" if "Phishing" in status else "green")
+    
+    status_label.config(
+        text=status,
+        bg="#FFCCCC" if status >= 10 else "#CCFFCC",  
+        fg="red" if status > 10 else "green"
+    )
     # Update body text
     body_text.config(state=tk.NORMAL)
     body_text.delete(1.0, tk.END)
     body_text.insert(tk.END, body)
     body_text.config(state=tk.DISABLED)
-
+    
+    

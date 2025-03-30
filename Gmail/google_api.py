@@ -10,9 +10,10 @@ from googleapiclient.errors import HttpError
 SCOPES = [
     'https://www.googleapis.com/auth/gmail.readonly',  # Read-only access
     'https://www.googleapis.com/auth/gmail.modify',    # Read/write access
-    'https://www.googleapis.com/auth/gmail.compose'    # Full access
-]
+    'https://www.googleapis.com/auth/gmail.compose',    # Full access
+    'https://www.googleapis.com/auth/gmail.labels'    # Full access
 
+]
 CREDENTIALS_FILE = 'credentials.json' 
 TOKEN_FILE = 'token.json'
 
@@ -43,4 +44,53 @@ def init_gmail_service():
         return service
     except HttpError as error:
         print(f'An error occurred building the service: {error}')
+        return None
+    
+def add_label_to_message(service, message_id, label_ids_to_add):
+    """Adds labels to a message."""
+    if not label_ids_to_add or None in label_ids_to_add:
+        print("No valid label IDs provided.")
+        return None
+
+    try:
+        modify_request = {'addLabelIds': label_ids_to_add, 'removeLabelIds': []}
+        message = service.users().messages().modify(
+            userId='me',
+            id=message_id,
+            body=modify_request
+        ).execute()
+        print(f"Added labels to message {message_id}")
+        return message
+    except HttpError as error:
+        print(f'Error modifying message: {error}')
+        return None
+    
+    
+def get_label_id(service, label_name):
+    """Gets or creates the ID of a label by its name."""
+    try:
+        # Check existing labels
+        results = service.users().labels().list(userId='me').execute()
+        labels = results.get('labels', [])
+        for label in labels:
+            if label['name'].lower() == label_name.lower():
+                print(f"Found label: {label['name']} (ID: {label['id']})")
+                return label['id']
+        
+        # Create the label if it doesn't exist
+        print(f"Label '{label_name}' not found. Creating it...")
+        label_body = {
+            'name': label_name,
+            'labelListVisibility': 'labelShow',
+            'messageListVisibility': 'show'
+        }
+        created_label = service.users().labels().create(
+            userId='me',
+            body=label_body
+        ).execute()
+        print(f"Created label: {created_label['name']} (ID: {created_label['id']})")
+        return created_label['id']
+    
+    except HttpError as error:
+        print(f'Error in get_label_id: {error}')
         return None
