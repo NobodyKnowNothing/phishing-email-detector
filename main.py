@@ -53,8 +53,11 @@ def checks(service):
                 else:
                     url_cleaned.append(result) 
         print(url_cleaned)
-        result = check_urls(url_cleaned,api_key)
+        
+        result = check_urls(urls,api_key)
+        print(result[0])
         score += result[0]
+
         if(result[0] != 0):
             email["URLHAUS_FAIL"] = "Fail"
 

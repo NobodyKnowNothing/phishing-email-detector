@@ -138,10 +138,10 @@ def show_email_details(email_data):
     
     status_label.config(
     text=status,
-    bg="#FFCCCC" if status == "High" else "#FFFFCC" if status == "Medium" else "#CCFFCC",
-    fg="red" if status == "High" else "orange" if status == "Medium" else "green" 
+    bg="#FFCCCC" if status == "High" else "#FFFFCC" if status == "Medium" else "#CCFFCC",  # Background
+    fg="red" if status == "High" else "orange" if status == "Medium" else "green"          # Text
     )
-    
+    # Update body text
     body_text.config(state=tk.NORMAL)
     body_text.delete(1.0, tk.END)
     body_text.insert(tk.END, body)
