@@ -112,8 +112,8 @@ def create_scrollable_listbox():
 def add_email(email_item):
     global email_data, email_tree  # <-- Ensure "email_tree" is declared
 
-    email_data.append((email_item["from"], email_item["subject"], "Pending", email_item["body"]))
-    email_tree.insert("", "end", values=(email_item["from"], email_item["subject"], "Pending"))
+    email_data.append((email_item["from"], email_item["subject"], "Score: " + str(email_item["score"]), email_item["body"]))
+    email_tree.insert("", "end", values=(email_item["from"], email_item["subject"], "Score: " + str(email_item["score"])))
     email_tree.bind("<<TreeviewSelect>>", lambda e: show_email_details(email_data))
 
 

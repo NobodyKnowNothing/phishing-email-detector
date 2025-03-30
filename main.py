@@ -14,14 +14,16 @@ def checks():
     for email in email_infos:
         score = 0
         if(email.get('body') != None):
-            score += check_key_words(email)
+            score += check_key_words(email) 
+            print("Score1:" + str(score))
+        score += check_dkim(email)
+        score += check_dmarc(email)
+        score += check_spf(email)
             
         print("Score: " + str(score))
+        email["score"] = score
         add_email(email)
         
-
-        
-
 
 
 if __name__ == '__main__':
