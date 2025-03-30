@@ -1,5 +1,6 @@
 import os.path
 import base64
+import requests
 from typing import List
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -7,13 +8,10 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-import os.path
-import base64
+
 import re # <-- Import regex module
 import json # <-- Import json module
 from collections import Counter # <-- Import Counter for easy counting
-import time
-
 from referencing import Resource # <-- Import time module (optional, for potential delays)
 
 
@@ -85,11 +83,17 @@ PHISHING_KEYWORDS = keywords = [
 
 global PHISHING_LINKS
 
+global unwanted_extentions
+
+
 def import_data():
     global PHISHING_LINKS
+    global unwanted_extentions
 
     with open('Data/phishing-links-NEW-today.txt', 'r') as file:
         PHISHING_LINKS = [PHISHING_LINKS.strip() for PHISHING_LINKS in file if PHISHING_LINKS.strip()]
+    with open('Data/unwated_extensions.txt', 'r') as file:
+        unwanted_extentions = [unwanted_extentions.strip() for unwanted_extentions in file if unwanted_extentions.strip()]
 
 def check_key_words(email_item):
     body = email_item['body']
@@ -112,33 +116,58 @@ def check_dmarc(email_item):
     if(email_item["dmarc"] == ['dmarc=pass']):
         return 0
     if(email_item["dmarc"] == None):
-        return 2
-    return 7
+        return 5
+    return 10
 
 def check_spf(email_item):
     if(email_item["spf"][:4] == "pass"):
         return 0
     elif(email_item["spf"] == None):
-        return 2
+        return 5
     else:
-        return 7
+        return 10
+    
 def check_dkim(email_item):
     if(email_item["dkim"] == ['dkim=pass']):
         return 0
     if(email_item["dkim"] == None):
-        return 2
-    return 7 
+        return 5
+    return 10
     
-def check_urls(urls):
+def query_urlhaus(url, auth_key):
+
+    api_url = "https://urlhaus-api.abuse.ch/v1/url/"
+    
+    headers = {}
+    if auth_key:
+        headers["Auth-Key"] = auth_key
+    
+    data = {"url": url}
+    
+    try:
+        response = requests.post(api_url, headers=headers, data=data)
+        response.raise_for_status()  # Raise exception for bad status codes
+        temp = response.json()
+        threat_status = temp.get('url_status')
+        threat_type =  temp.get('threat')
+        response_item = {
+            "threat_status" : threat_status,
+            "threat_type" : threat_type
+        }
+        return response_item
+    except requests.exceptions.RequestException as e:
+        print(f"Error querying URLhaus: {e}")
+        return None
+    
+def check_urls(urls, api_key):
     for url in urls:
-        parts = url.split('/')
-        # Get everything after the third slash
-        if len(parts) >= 4:
-            result = '/'.join(parts[:3])
-            print(result)
-            if result in PHISHING_LINKS:
-                return 10
-    return 0
+        results = query_urlhaus(url,api_key)
+        threat_status = results['threat_status']
+        threat_type = results['threat_type']
+
+        if(threat_status != None):
+            return (50,threat_status,threat_type)
+    return (0,'','')
 
 
 
@@ -257,7 +286,6 @@ def extract_urls(text) -> List[str]:
 
 def fetch_and_extract_urls(service, message_id):
 
-    print(f"\nFetching body for message ID: {message_id}...")
     email_body = get_email_body(service, msg_id=message_id)
 
     if email_body is None:
@@ -270,9 +298,28 @@ def fetch_and_extract_urls(service, message_id):
         # print("\n--- Email Body Extracted (Snippet) ---")
         # print(email_body[:500] + "..." if len(email_body) > 500 else email_body)
         # print("--- End Snippet ---")
-        print("\nExtracting URLs...")
         urls_found = extract_urls(email_body)
         return urls_found
 
 
-        
+def common_file_names_check(payload):
+    global unwanted_extentions
+    filenames = []
+    malicious_file_score = 0
+    parts = payload.get('parts')
+    if parts != None:
+        for y in parts:
+            if y.get('filename') == '':
+                filename = "Filename has not been found"
+                filenames.append(filename)
+            else:
+                filenames.append(y.get('filename'))
+
+        for x in filenames:
+            extensions = re.findall(r'(.[a-zA-Z0-9]+)$', x)
+
+        for j in extensions:
+            if j in unwanted_extentions:
+                malicious_file_score += 15
+                
+    return malicious_file_score

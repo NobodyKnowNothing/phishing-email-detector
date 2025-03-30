@@ -111,9 +111,16 @@ def create_scrollable_listbox():
 
 def add_email(email_item):
     global email_data, email_tree  # <-- Ensure "email_tree" is declared
-
-    email_data.append((email_item["from"], email_item["subject"], str(email_item["score"]), email_item["body"]))
-    email_tree.insert("", "end", values=(email_item["from"], email_item["subject"],str(email_item["score"])))
+    status = "Low"
+    if(email_item["score"] <= 15):
+        status = "Low"
+    elif(email_item["score"] > 15 and email_item["score"] < 30):
+        status = "Medium"
+    elif(email_item["score"] >= 30):
+        status = "High"
+        
+    email_data.append((email_item["from"], email_item["subject"], status, email_item["body"]))
+    email_tree.insert("", "end", values=(email_item["from"], email_item["subject"],status))
     email_tree.bind("<<TreeviewSelect>>", lambda e: show_email_details(email_data))
 
 
@@ -132,9 +139,9 @@ def show_email_details(email_data):
     detail_frame.grid_slaves(row=1, column=1)[0].config(text=subject)
     
     status_label.config(
-        text=status,
-        bg="#FFCCCC" if status >= 10 else "#CCFFCC",  
-        fg="red" if status > 10 else "green"
+    text=status,
+    bg="#FFCCCC" if status == "High" else "#FFFFCC" if status == "Medium" else "#CCFFCC",  # Background
+    fg="red" if status == "High" else "orange" if status == "Medium" else "green"          # Text
     )
     # Update body text
     body_text.config(state=tk.NORMAL)

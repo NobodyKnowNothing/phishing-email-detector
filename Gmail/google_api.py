@@ -1,5 +1,7 @@
 import os.path
 import base64
+import requests
+
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -59,7 +61,6 @@ def add_label_to_message(service, message_id, label_ids_to_add):
             id=message_id,
             body=modify_request
         ).execute()
-        print(f"Added labels to message {message_id}")
         return message
     except HttpError as error:
         print(f'Error modifying message: {error}')
@@ -74,7 +75,6 @@ def get_label_id(service, label_name):
         labels = results.get('labels', [])
         for label in labels:
             if label['name'].lower() == label_name.lower():
-                print(f"Found label: {label['name']} (ID: {label['id']})")
                 return label['id']
         
         # Create the label if it doesn't exist
@@ -88,9 +88,11 @@ def get_label_id(service, label_name):
             userId='me',
             body=label_body
         ).execute()
-        print(f"Created label: {created_label['name']} (ID: {created_label['id']})")
         return created_label['id']
     
     except HttpError as error:
         print(f'Error in get_label_id: {error}')
         return None
+    
+    
+

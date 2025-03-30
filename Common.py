@@ -5,7 +5,7 @@ from email.parser import BytesParser
 from email.generator import BytesGenerator
 import io
 
-def extract_header_components(header,body, message_id):
+def extract_header_components(header,body, message_id, payload):
     message_info = []
     
     date = ''
@@ -51,7 +51,8 @@ def extract_header_components(header,body, message_id):
             
         if i.get('name') == "From":
             index = header.index(i)
-            from_field = header[index].get('value')
+            temp = header[index] 
+            from_field = re.findall(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', temp.get('value'))
             # print(from_field)
         elif from_field == '' or from_field == 'none':
             from_field = 'none'
@@ -70,7 +71,6 @@ def extract_header_components(header,body, message_id):
         elif to_field == '' or to_field == 'none':
             to_field = 'none'
         
-        
         if i.get('name') == "Received":
             index = header.index(i)
             temp = header[index]
@@ -85,10 +85,7 @@ def extract_header_components(header,body, message_id):
             # print(message_id)
         elif date == '' or date == 'none':
             date = 'none'
-            
-        
-        
-            
+ 
     new_item = {
         "message_id" : message_id,
         "date": date,
@@ -100,7 +97,16 @@ def extract_header_components(header,body, message_id):
         "dkim" : dkim,
         "return_path" : returning_path,
         "received" : received,
-        "body" : body
+        "body" : body,
+        "payload": payload,
+        "threat_status":"",
+        "threat_type":"",
+        "KEY_WORDS_FAIL":"Pass",
+        "DKIM_FAIL":"Pass",
+        "DMARC_FAIL":"Pass",
+        "SPF_FAIL":"Pass",
+        "URLHAUS_FAIL":"Pass",
+        
     }
     
     return new_item
@@ -146,7 +152,6 @@ def extract_body_text(parts):
     
 def gmail_pharser(message_id, service):
     
-        # Step 2: Get the full message using the ID
         message_response = service.users().messages().get(
             userId='me',
             id=message_id,
@@ -161,7 +166,7 @@ def gmail_pharser(message_id, service):
         
         body = extract_body_text(payload.get('parts', []))
         
-        return (header,body)
+        return (header,body,parts, payload)
         
 
 def import_eml_message(eml_path, service):

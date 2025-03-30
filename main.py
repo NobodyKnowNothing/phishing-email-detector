@@ -5,32 +5,76 @@ from Gmail.phishing_check import *
 
 
 email_infos = []
+api_key = ''
 
 def checks(service):
     print("--------------------------------CHECKS--------------------------")
     global email_infos
     for email in email_infos:
         score = 0
+        result = 0
+        failed_checks = []
         if(email.get('body') != None):
-            score += check_key_words(email) 
+            result = check_key_words(email) 
+            score += result
+            email["KEY_WORDS_FAIL"] = "Fail"
             
-        score += check_dkim(email)
-        score += check_dmarc(email)
-        score += check_spf(email)
-        urls = fetch_and_extract_urls(service, email["message_id"])
+        result = check_dkim(email)
+        if(result != 0):
+            email["DKIM_FAIL"] = "Fail"
+        score += result
         
-        score += check_urls(urls)
+        result = check_dmarc(email)
+        if(result != 0):
+            email["DMARC_FAIL"] = "Fail"
+        score += result
+        result = check_spf(email)
+        if(result != 0):
+            email["SPF_FAIL"] = "Fail"
+        score += result
+        urls = fetch_and_extract_urls(service, email["message_id"])
+        url_cleaned = []
+        for url in urls:
+            parts = url.split('/')
+            # Get everything after the third slash
+            if len(parts) >= 4:
+                result = '/'.join(parts[:3])
+                if result in url_cleaned:
+                    pass
+                else:
+                    url_cleaned.append(result) 
+        print(url_cleaned)
+        result = check_urls(url_cleaned,api_key)
+        result = result[0]
+        if(result != 0):
+            email["URLHAUS_FAIL"] = "Fail"
+
+        score += result
+        email["threat_status"] = result[1]
+        email["threat_type"] = result[2]
+        email["fails"] = failed_checks
+
+        result = common_file_names_check(email["payload"])
+        if(result != 0):
+            email["EXTENSIONS_FAIL"] = "Fail"
+        score += result
             
         print("Score: " + str(score))
         email["score"] = score
         #add the label to the email so when in your gmail inbox you will see its been checked
-        label_id = get_label_id(service, "Dangerous")
-        print(email["message_id"])
-        if label_id and "message_id" in email and email["message_id"] and score > 10:
+        Low_Threat_id = get_label_id(service, "Low Threat")
+        Medium_Threat_id = get_label_id(service, "Medium Threat")
+        High_Threat_id = get_label_id(service, "High Threat")
+
+        if  Low_Threat_id and "message_id" in email and email["message_id"] and score <= 15:
             sanitized_id = email["message_id"].strip("<>").replace(" ", "")
-            add_label_to_message(service, sanitized_id, [label_id])
-        else:
-            print("Skipping email: Invalid ID or missing label.")
+            add_label_to_message(service, sanitized_id, [Low_Threat_id])
+        elif  Medium_Threat_id and "message_id" in email and email["message_id"] and score > 15 and score < 30:
+            sanitized_id = email["message_id"].strip("<>").replace(" ", "")
+            add_label_to_message(service, sanitized_id, [Medium_Threat_id])
+        elif  High_Threat_id and "message_id" in email and email["message_id"] and score >= 30:
+            sanitized_id = email["message_id"].strip("<>").replace(" ", "")
+            add_label_to_message(service, sanitized_id, [High_Threat_id])
 
         add_email(email)       
 
@@ -39,7 +83,7 @@ def import_test_case(path, service):
     message = import_eml_message(path,service)
     header = gmail_pharser(message.get('id'),service)[0]
     body = gmail_pharser(message.get('id'),service)[1]
-    email_infos.append(extract_header_components(header,body,message.get('id')))
+    email_infos.append(extract_header_components(header,body,message.get('id'),message))
 
 #phishing emails from our personal accounts that we are using for the test cases
 def test_cases(service):
@@ -49,6 +93,8 @@ def test_cases(service):
 
 
 if __name__ == '__main__':
+    api_key = open('key.txt', 'r').read()
+    
     init_UI()
     
     import_data()
@@ -58,12 +104,13 @@ if __name__ == '__main__':
     if 'messages' in list_response:
         for message in list_response.get('messages'):
             message_id = message.get('id')
-            header = gmail_pharser(message_id,service)[0]
-            body = gmail_pharser(message_id,service)[1]
-
-            email_infos.append(extract_header_components(header,body, message_id))
+            message = gmail_pharser(message_id,service)
+            header = message[0]
+            body = message[1]
+            parts = message[2]
+            payload = message[3]
             
-            
+            email_infos.append(extract_header_components(header,body, message_id, payload))
     
     checks(service)
     display_UI()
