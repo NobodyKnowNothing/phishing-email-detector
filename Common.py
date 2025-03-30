@@ -25,7 +25,6 @@ def extract_header_components(header,body, message_id, payload):
             dmarc = re.findall(r'dmarc=pass|dmarc=fail', temp.get('value'))
         elif dmarc == '' or dmarc == 'none':
             dmarc = 'none'
-            # print(authentication_results)
             
         if i.get('name') == "Authentication-Results":
             index = header.index(i)
@@ -38,14 +37,12 @@ def extract_header_components(header,body, message_id, payload):
             index = header.index(i)
             temp = header[index]
             dkim = re.findall(r'dkim=pass|dkim=fail', temp.get('value'))
-            # print(message_id)
         elif dkim == '' or dkim == 'none':
             dkim = 'none'
             
         if i.get('name') == "Return-Path":
             index = header.index(i)
             returning_path = header[index].get('value')
-            # print(returning_path)
         elif returning_path == '' or returning_path == 'none':
             returning_path = 'none'
             
@@ -53,21 +50,18 @@ def extract_header_components(header,body, message_id, payload):
             index = header.index(i)
             temp = header[index] 
             from_field = re.findall(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', temp.get('value'))
-            # print(from_field)
         elif from_field == '' or from_field == 'none':
             from_field = 'none'
         
         if i.get('name') == "Subject":
             index = header.index(i)
             subject_field = header[index].get('value')
-            # print(subject_field)
         elif subject_field == '' or subject_field == 'none':
             subject_field = 'none'
         
         if i.get('name') == "To":
             index = header.index(i)
             to_field = header[index].get('value')
-            # print(to_field)
         elif to_field == '' or to_field == 'none':
             to_field = 'none'
         
@@ -75,14 +69,12 @@ def extract_header_components(header,body, message_id, payload):
             index = header.index(i)
             temp = header[index]
             received = re.findall(r'(?:from|by)\s+([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})', temp.get('value'))
-            # print(message_id)
         elif received == '' or received == 'none':
             received = 'none'
         
         if i.get('name') == "Date":
             index = header.index(i)
             date = header[index].get('value')
-            # print(message_id)
         elif date == '' or date == 'none':
             date = 'none'
  
@@ -106,29 +98,24 @@ def extract_header_components(header,body, message_id, payload):
         "DMARC_FAIL":"Pass",
         "SPF_FAIL":"Pass",
         "URLHAUS_FAIL":"Pass",
-        
+        "EXTENSIONS_FAIL":"Pass"
     }
     
     return new_item
-
-# For instance, if you send a test email to 30 mailboxes and it lands in the inbox of 20 recipients, the calculation would be 20/30*10, resulting in a Spam Score of 6.6 out of 10.
-
         
 def get_decoded_body(part):
     """Decodes the base64 encoded email body part."""
     body_data = part.get('body', {}).get('data')
     if body_data:
         try:
-            # Gmail API uses url-safe base64 encoding
             decoded_bytes = base64.urlsafe_b64decode(body_data.encode('ASCII'))
-            # Try decoding as UTF-8, replace errors if necessary
             return decoded_bytes.decode('utf-8', errors='replace')
         except (ValueError, TypeError, base64.binascii.Error) as e:
             print(f"Error decoding base64 body part: {e}")
-            return "" # Return empty string on decoding error
+            return "" 
         except UnicodeDecodeError as e:
              print(f"Error decoding body part content to text: {e}")
-             return "" # Return empty string on text decoding error
+             return ""
     return ""
 
 def extract_body_text(parts):
@@ -140,12 +127,9 @@ def extract_body_text(parts):
             if mime_type == 'text/plain':
                 body_text += get_decoded_body(part) + "\n"
             elif mime_type == 'text/html':
-                # We could parse HTML here for better text extraction,
-                # but for just finding URLs, searching the raw HTML often works.
-                # For cleaner text, use libraries like BeautifulSoup.
+                
                 body_text += get_decoded_body(part) + "\n"
             elif 'parts' in part:
-                # Recursively process nested parts (e.g., multipart/alternative)
                 body_text += extract_body_text(part['parts'])
     return body_text
 
@@ -158,7 +142,6 @@ def gmail_pharser(message_id, service):
             format='full'
         ).execute()
 
-        # Step 3: Parse the message content
         payload = message_response['payload']
         header = payload.get('headers', [])
         body = payload.get('body', [])
@@ -188,7 +171,7 @@ def import_eml_message(eml_path, service):
         body={
             'raw': raw,
             'labelIds': ['INBOX'],
-            'internalDateSource': 'dateHeader',  # Preserve original timestamp
+            'internalDateSource': 'dateHeader', 
             'payload': {
                 'headers': [{
                     'name': 'X-Original-Message-ID',

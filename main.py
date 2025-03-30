@@ -14,24 +14,33 @@ def checks(service):
         score = 0
         result = 0
         failed_checks = []
+        
+        #Checks body and subject of the email for keywords, each keyword is 1 threat point
         if(email.get('body') != None):
             result = check_key_words(email) 
             score += result
             email["KEY_WORDS_FAIL"] = "Fail"
-            
+        
+        #DKIM CHECK
         result = check_dkim(email)
         if(result != 0):
             email["DKIM_FAIL"] = "Fail"
         score += result
         
+        #DMARC CHECK
         result = check_dmarc(email)
         if(result != 0):
             email["DMARC_FAIL"] = "Fail"
         score += result
         result = check_spf(email)
+        
+        #SPF_FAIL
         if(result != 0):
             email["SPF_FAIL"] = "Fail"
         score += result
+        
+        #This gets all the urls in the email but will also open those urls and get any hidden javascript redirct emails 
+        #they are then passed to URLhaus for threat evaluation
         urls = fetch_and_extract_urls(service, email["message_id"])
         url_cleaned = []
         for url in urls:
@@ -45,15 +54,19 @@ def checks(service):
                     url_cleaned.append(result) 
         print(url_cleaned)
         result = check_urls(url_cleaned,api_key)
-        result = result[0]
-        if(result != 0):
+        score += result[0]
+        if(result[0] != 0):
             email["URLHAUS_FAIL"] = "Fail"
 
-        score += result
-        email["threat_status"] = result[1]
-        email["threat_type"] = result[2]
+        
+        if(result[1]["status"] != None):
+            email["threat_status"] = result[1]["status"]
+        if(result[1]["type"] != None):    
+            email["threat_type"] = result[1]["type"]
         email["fails"] = failed_checks
 
+
+        #Checks the email for extensions blacklist this blacklist can be found at unwated_extensions.txt
         result = common_file_names_check(email["payload"])
         if(result != 0):
             email["EXTENSIONS_FAIL"] = "Fail"
@@ -66,6 +79,12 @@ def checks(service):
         Medium_Threat_id = get_label_id(service, "Medium Threat")
         High_Threat_id = get_label_id(service, "High Threat")
 
+        
+        #THREAT EVAL
+        #low <= 15
+        #Medium 16-29
+        #High >= 30
+        
         if  Low_Threat_id and "message_id" in email and email["message_id"] and score <= 15:
             sanitized_id = email["message_id"].strip("<>").replace(" ", "")
             add_label_to_message(service, sanitized_id, [Low_Threat_id])
@@ -76,6 +95,7 @@ def checks(service):
             sanitized_id = email["message_id"].strip("<>").replace(" ", "")
             add_label_to_message(service, sanitized_id, [High_Threat_id])
 
+        #email goes to the UI
         add_email(email)       
 
 def import_test_case(path, service):

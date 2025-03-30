@@ -166,8 +166,8 @@ def check_urls(urls, api_key):
         threat_type = results['threat_type']
 
         if(threat_status != None):
-            return (50,threat_status,threat_type)
-    return (0,'','')
+            return (50, {"status":threat_status,"type":threat_type})
+    return (0, {"status":None,"type":None})
 
 
 

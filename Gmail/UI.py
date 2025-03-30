@@ -102,15 +102,13 @@ def create_scrollable_listbox():
     # Configure grid weights
     bottom_frame.grid_rowconfigure(0, weight=1)
     bottom_frame.grid_columnconfigure(0, weight=1)
-
-    # Add sample data
     
     # Bind selection event
     email_tree.bind("<<TreeviewSelect>>", lambda e: show_email_details(email_data))
 
 
 def add_email(email_item):
-    global email_data, email_tree  # <-- Ensure "email_tree" is declared
+    global email_data, email_tree
     status = "Low"
     if(email_item["score"] <= 15):
         status = "Low"
@@ -140,10 +138,10 @@ def show_email_details(email_data):
     
     status_label.config(
     text=status,
-    bg="#FFCCCC" if status == "High" else "#FFFFCC" if status == "Medium" else "#CCFFCC",  # Background
-    fg="red" if status == "High" else "orange" if status == "Medium" else "green"          # Text
+    bg="#FFCCCC" if status == "High" else "#FFFFCC" if status == "Medium" else "#CCFFCC",
+    fg="red" if status == "High" else "orange" if status == "Medium" else "green" 
     )
-    # Update body text
+    
     body_text.config(state=tk.NORMAL)
     body_text.delete(1.0, tk.END)
     body_text.insert(tk.END, body)
