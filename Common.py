@@ -51,8 +51,7 @@ def extract_header_components(header,body, message_id):
             
         if i.get('name') == "From":
             index = header.index(i)
-            temp = header[index] 
-            from_field = re.findall(r'<([^>]+)>', temp.get('value'))
+            from_field = header[index].get('value')
             # print(from_field)
         elif from_field == '' or from_field == 'none':
             from_field = 'none'
@@ -101,7 +100,7 @@ def extract_header_components(header,body, message_id):
         "dkim" : dkim,
         "return_path" : returning_path,
         "received" : received,
-       "body" : body
+        "body" : body
     }
     
     return new_item

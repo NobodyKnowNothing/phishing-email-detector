@@ -17,11 +17,9 @@ def checks(service):
         score += check_dkim(email)
         score += check_dmarc(email)
         score += check_spf(email)
-        
         urls = fetch_and_extract_urls(service, email["message_id"])
         
         score += check_urls(urls)
-
             
         print("Score: " + str(score))
         email["score"] = score
